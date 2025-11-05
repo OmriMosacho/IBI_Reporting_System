@@ -1,0 +1,16 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Server of the IBI Reports Application",
+  "repository": {
+    "type": "git",
+    "url": "IBI_Reporting_System"
+  },
+  "license": "ISC",
+  "author": "Omri Mosacho",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  }
+}
