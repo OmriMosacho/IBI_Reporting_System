@@ -1,0 +1,27 @@
+.metric-card {
+  background-color: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 25px;
+  box-shadow: var(--shadow);
+  transition: 0.2s ease;
+  text-align: left;
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.metric-value {
+  margin-top: 10px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text-dark);
+}

@@ -1,0 +1,23 @@
+.dashboard-container {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.dashboard-container h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: var(--text-dark);
+}
+
+.subtitle {
+  color: var(--text-light);
+  margin-bottom: 40px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 25px;
+}
