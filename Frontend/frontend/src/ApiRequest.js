@@ -1,7 +1,14 @@
 import axios from "axios";
 
+/**
+ * Base URL for the API requests
+ */
 const API_BASE_URL = "http://localhost:4000/api";
 
+/**
+ * Axios instance with base URL and default headers
+ * Used for making API requests throughout the application
+ */
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
