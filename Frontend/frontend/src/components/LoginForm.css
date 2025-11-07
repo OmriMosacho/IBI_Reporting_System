@@ -79,3 +79,17 @@
   cursor: pointer;
   font-weight: bold;
 }
+
+.password-match-text {
+  font-size: 0.85rem;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.password-match-text.match {
+  color: #2e7d32; /* Green */
+}
+
+.password-match-text.mismatch {
+  color: #d32f2f; /* Red */
+}

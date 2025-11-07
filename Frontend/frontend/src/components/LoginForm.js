@@ -2,10 +2,10 @@
  * @file LoginForm.js
  * @module components/LoginForm
  * @description
- * Login and registration component with password visibility toggle and confirm password check.
+ * Login and registration component with password visibility toggle and real-time password match validation.
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { api } from '../ApiRequest';
 import './LoginForm.css';
 
@@ -19,19 +19,33 @@ export default function LoginForm({ setToken }) {
     confirmPassword: '',
   });
   const [error, setError] = useState('');
+  const [passwordMatch, setPasswordMatch] = useState(null);
 
-  /** Handle input field changes */
+  /** Handle form input changes */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  /** Handle submit for login or register */
+  /** Watch password fields for real-time match check */
+  useEffect(() => {
+    if (isRegistering) {
+      if (!formData.confirmPassword) {
+        setPasswordMatch(null);
+      } else if (formData.password === formData.confirmPassword) {
+        setPasswordMatch(true);
+      } else {
+        setPasswordMatch(false);
+      }
+    }
+  }, [formData.password, formData.confirmPassword, isRegistering]);
+
+  /** Handle login/register form submission */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Check for password mismatch when registering
+    // Validation for registration mode
     if (isRegistering && formData.password !== formData.confirmPassword) {
       setError('Passwords do not match.');
       return;
@@ -108,14 +122,25 @@ export default function LoginForm({ setToken }) {
         </div>
 
         {isRegistering && (
-          <input
-            type={showPassword ? 'text' : 'password'}
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
+          <>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+            {passwordMatch !== null && (
+              <p
+                className={`password-match-text ${
+                  passwordMatch ? 'match' : 'mismatch'
+                }`}
+              >
+                {passwordMatch ? '✅ Passwords match' : '❌ Passwords do not match'}
+              </p>
+            )}
+          </>
         )}
 
         <button type="submit" className="btn-primary">
@@ -130,7 +155,12 @@ export default function LoginForm({ setToken }) {
         <button
           type="button"
           className="link-button"
-          onClick={() => setIsRegistering(!isRegistering)}
+          onClick={() => {
+            setIsRegistering(!isRegistering);
+            setFormData({ username: '', email: '', password: '', confirmPassword: '' });
+            setPasswordMatch(null);
+            setError('');
+          }}
         >
           {isRegistering ? 'Login here' : 'Register here'}
         </button>
