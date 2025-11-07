@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>pages/AnalyticsDashboard.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#API_BASE_URL">API_BASE_URL</a></li><li><a href="global.html#apiClient">apiClient</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">pages/AnalyticsDashboard.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file AnalyticsDashboard.js
+ * @module AnalyticsDashboard
+ * @description
+ * Displays analytical visualizations for different data domains (Customers, Companies, Stocks).
+ * Users can select which subject to analyze via a dropdown. Each subject shows corresponding charts.
+ * The dashboard fetches aggregated analytics data from backend endpoints using a shared API client.
+ *
+ * @requires react
+ * @requires recharts
+ * @requires ../ApiRequest
+ * @requires ./AnalyticsDashboard.css
+ */
+
+import { useEffect, useState } from 'react';
+import { api } from '../ApiRequest';
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
+  BarChart, Bar, Legend, PieChart, Pie, Cell, ResponsiveContainer,
+} from 'recharts';
+import './AnalyticsDashboard.css';
+
+/**
+ * @function AnalyticsDashboard
+ * @description
+ * React component displaying analytics for Customers, Companies, and Stocks.
+ * A dropdown lets users toggle which subject’s charts are visible.
+ * Data is fetched once and stored in state to avoid redundant requests.
+ *
+ * @returns {JSX.Element} The rendered analytics dashboard component.
+ */
+export default function AnalyticsDashboard() {
+  /** @member {string} selectedSubject - Currently selected analytics category. */
+  const [selectedSubject, setSelectedSubject] = useState('customers');
+
+  /** @member {Array&lt;Object>} avgTenure - Average tenure data for customer segments. */
+  const [avgTenure, setAvgTenure] = useState([]);
+
+  /** @member {Array&lt;Object>} monthlyJoins - Monthly customer acquisition trend data. */
+  const [monthlyJoins, setMonthlyJoins] = useState([]);
+
+  /** @member {Array&lt;Object>} currencyDist - Company currency distribution data. */
+  const [currencyDist, setCurrencyDist] = useState([]);
+
+  /** @member {Array&lt;Object>} volatility - Stock price volatility data. */
+  const [volatility, setVolatility] = useState([]);
+
+  /** @member {Array&lt;string>} COLORS - Chart color palette for categorical visuals. */
+  const COLORS = ['#4A6EF5', '#F57C00', '#00BFA5', '#BA68C8', '#43A047'];
+
+  /**
+   * @function useEffect
+   * @description
+   * Fetches analytics data from backend endpoints for all subjects (customers, companies, stocks).
+   * Each dataset is normalized and coerced to numeric form for Recharts compatibility.
+   * Executed once when the component mounts.
+   */
+  useEffect(() => {
+    Promise.all([
+      api.get('/customers/avg-tenure'),
+      api.get('/customers/monthly-joins'),
+      api.get('/companies/currency-distribution'),
+      api.get('/stocks/volatility'),
+    ])
+      .then(([tenure, joins, currency, vol]) => {
+        // --- Customers ---
+        const fixedTenure = (tenure.rows || tenure).map((t) => ({
+          ...t,
+          avg_tenure: Number(t.avg_tenure),
+        }));
+        const fixedJoins = (joins.rows || joins).map((j) => ({
+          ...j,
+          new_customers: Number(j.new_customers),
+        }));
+        setAvgTenure(fixedTenure);
+        setMonthlyJoins(fixedJoins);
+
+        // --- Companies ---
+        const fixedCurrency = (currency.rows || currency)
+          .filter((c) => c.currency &amp;&amp; c.company_count)
+          .map((c) => ({
+            currency: String(c.currency).trim(),
+            company_count: Number(c.company_count) || 0,
+          }));
+        setCurrencyDist(fixedCurrency);
+
+        // --- Stocks ---
+        const fixedVol = (vol.rows || vol).map((v) => ({
+          ...v,
+          price_range: Number(v.price_range),
+        }));
+        setVolatility(fixedVol);
+      })
+      .catch((err) => console.error('Error fetching analytics:', err));
+  }, []);
+
+  return (
+    &lt;div className="analytics-container">
+      &lt;h1>Analytics Dashboard&lt;/h1>
+
+      {/* ========== DROPDOWN SELECTOR ========== */}
+      &lt;div className="dropdown-container">
+        &lt;label htmlFor="subject-select">Select Subject:&lt;/label>
+        &lt;select
+          id="subject-select"
+          value={selectedSubject}
+          onChange={(e) => setSelectedSubject(e.target.value)}
+        >
+          &lt;option value="customers">Customers&lt;/option>
+          &lt;option value="companies">Companies&lt;/option>
+          &lt;option value="stocks">Stocks&lt;/option>
+        &lt;/select>
+      &lt;/div>
+
+      {/* ========== CUSTOMERS SECTION ========== */}
+      {selectedSubject === 'customers' &amp;&amp; (
+        &lt;section>
+          &lt;h2>Customers&lt;/h2>
+
+          &lt;h3>Average Tenure by Segment&lt;/h3>
+          &lt;ResponsiveContainer width="100%" height={300}>
+            &lt;BarChart data={avgTenure}>
+              &lt;CartesianGrid strokeDasharray="3 3" />
+              &lt;XAxis dataKey="segment" />
+              &lt;YAxis />
+              &lt;Tooltip />
+              &lt;Legend />
+              &lt;Bar dataKey="avg_tenure" fill="#4A6EF5" />
+            &lt;/BarChart>
+          &lt;/ResponsiveContainer>
+
+          &lt;h3>Monthly New Customer Joins&lt;/h3>
+          &lt;ResponsiveContainer width="100%" height={300}>
+            &lt;LineChart data={monthlyJoins}>
+              &lt;CartesianGrid strokeDasharray="3 3" />
+              &lt;XAxis dataKey="month" />
+              &lt;YAxis />
+              &lt;Tooltip />
+              &lt;Legend />
+              &lt;Line type="monotone" dataKey="new_customers" stroke="#F57C00" />
+            &lt;/LineChart>
+          &lt;/ResponsiveContainer>
+        &lt;/section>
+      )}
+
+      {/* ========== COMPANIES SECTION ========== */}
+      {selectedSubject === 'companies' &amp;&amp; (
+        &lt;section>
+          &lt;h2>Companies&lt;/h2>
+
+          {currencyDist.length === 0 ? (
+            &lt;p>Loading currency distribution...&lt;/p>
+          ) : (
+            &lt;ResponsiveContainer width="100%" height={350}>
+              &lt;PieChart>
+                &lt;Pie
+                  data={currencyDist}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={130}
+                  dataKey="company_count"
+                  nameKey="currency"
+                  label={({ currency, company_count }) =>
+                    `${currency}: ${company_count}`
+                  }
+                >
+                  {currencyDist.map((entry, i) => (
+                    &lt;Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                &lt;/Pie>
+                &lt;Tooltip
+                  formatter={(value, name, props) => [
+                    value,
+                    props.payload.currency || name,
+                  ]}
+                />
+                &lt;Legend />
+              &lt;/PieChart>
+            &lt;/ResponsiveContainer>
+          )}
+        &lt;/section>
+      )}
+
+      {/* ========== STOCKS SECTION ========== */}
+      {selectedSubject === 'stocks' &amp;&amp; (
+        &lt;section>
+          &lt;h2>Stock Volatility&lt;/h2>
+          &lt;ResponsiveContainer width="100%" height={300}>
+            &lt;BarChart data={volatility}>
+              &lt;CartesianGrid strokeDasharray="3 3" />
+              &lt;XAxis dataKey="ticker" />
+              &lt;YAxis />
+              &lt;Tooltip />
+              &lt;Legend />
+              &lt;Bar dataKey="price_range" fill="#BA68C8" />
+            &lt;/BarChart>
+          &lt;/ResponsiveContainer>
+        &lt;/section>
+      )}
+    &lt;/div>
+  );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 16:40:20 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

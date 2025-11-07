@@ -21,3 +21,30 @@ body {
 .app-container {
   min-height: 100vh;
 }
+
+
+.top-nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.top-nav button {
+  background: #e7e9ee;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.top-nav button.active {
+  background: #4a6ef5;
+  color: #fff;
+}
+
+.top-nav button:hover {
+  background: #d5d9e5;
+}

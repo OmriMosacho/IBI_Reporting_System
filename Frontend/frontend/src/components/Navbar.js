@@ -5,7 +5,7 @@ export default function Navbar({ activeTab, setActiveTab, onLogout }) {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <h2>📊 Data Insights</h2>
+        <h2>Raw Data</h2>
         <div className="tabs">
           <button
             className={activeTab === 'customers' ? 'tab active' : 'tab'}
