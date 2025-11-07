@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>routes/rawData.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routes_analytics.html">routes/analytics</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/by-sector-country">GET /api/analytics/companies/by-sector-country</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/currency-distribution">GET /api/analytics/companies/currency-distribution</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/avg-tenure">GET /api/analytics/customers/avg-tenure</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/monthly-joins">GET /api/analytics/customers/monthly-joins</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/price-trend">GET /api/analytics/stocks/price-trend</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/volatility">GET /api/analytics/stocks/volatility</a></li></ul></li><li><a href="module-routes_rawData.html">routes/rawData</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_rawData.html#~GET/api/fetch_table">GET /api/fetch_table</a></li></ul></li><li><a href="module-routes_users.html">routes/users</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_users.html#~DELETE/api/users/:id">DELETE /api/users/:id</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~GET/api/users">GET /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/login">POST /api/login</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/users">POST /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~PUT/api/users/:id">PUT /api/users/:id</a></li></ul></li><li><a href="module-server_index.html">server/index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-server_index.html#~loadEnvironment">loadEnvironment</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~registerRoutes">registerRoutes</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~startServer">startServer</a></li></ul></li><li><a href="module-services.html">services</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-services.html#~authenticateToken">authenticateToken</a></li></ul></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">routes/rawData.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file rawData.js
+ * @module routes/rawData
+ * @description
+ * Provides basic data-fetching endpoints that query entire tables
+ * directly from the PostgreSQL database. These routes are primarily
+ * used for raw data inspection and lightweight data retrieval
+ * without additional logic or aggregation.
+ */
+
+/**
+ * @requires ../services - Shared backend services including JWT authentication middleware.
+ */
+const { authenticateToken } = require('../services');
+
+
+/**
+ * @function module.exports
+ * @description
+ * Registers the raw-data route handlers with the provided Express app.
+ *
+ * @param {object} app - The Express application instance.
+ * @param {Object} conn - The PostgreSQL database connection object.
+ */
+module.exports = (app, conn) => {
+
+  /**
+   * @function GET /api/fetch_table
+   * @description
+   * Fetches and returns all rows from a specified table in ascending
+   * order by the first column.
+   *
+   * @route GET /api/fetch_table
+   * @query {string} tableName - The name of the database table to query.
+   * @returns {Array&lt;Object>} An array of rows from the requested table.
+   *
+   * @example
+   * // Request
+   * GET /api/fetch_table?tableName=customers
+   *
+   * // Response
+   * [
+   *   { customerid: 'C100000', customername: 'Tal Shaked', ... },
+   *   { customerid: 'C100001', customername: 'Eli Azoulay', ... }
+   * ]
+   */
+  app.get('/api/fetch_table', authenticateToken, (req, res, next) => {
+    const tableName = req.query.tableName;
+
+    // Construct SQL query dynamically
+    const sql = `SELECT * FROM ${tableName} ORDER BY 1 ASC;`;
+
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Database query error:', err.message);
+        next(err);
+        return;
+      }
+      res.send(results);
+    });
+  });
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:32:08 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

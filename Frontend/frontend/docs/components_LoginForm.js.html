@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>components/LoginForm.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~handleSubjectChange">handleSubjectChange</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-ApiRequest.html">ApiRequest</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~requestInterceptor">requestInterceptor</a></li><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~responseInterceptor">responseInterceptor</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-components_LoginForm.html">components/LoginForm</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">components/LoginForm.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file LoginForm.js
+ * @module components/LoginForm
+ * @description
+ * Login and registration component with password visibility toggle and real-time password match validation.
+ */
+
+import { useState, useEffect } from 'react';
+import { api } from '../ApiRequest';
+import './LoginForm.css';
+
+export default function LoginForm({ setToken }) {
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
+  const [error, setError] = useState('');
+  const [passwordMatch, setPasswordMatch] = useState(null);
+
+  /** Handle form input changes */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  /** Watch password fields for real-time match check */
+  useEffect(() => {
+    if (isRegistering) {
+      if (!formData.confirmPassword) {
+        setPasswordMatch(null);
+      } else if (formData.password === formData.confirmPassword) {
+        setPasswordMatch(true);
+      } else {
+        setPasswordMatch(false);
+      }
+    }
+  }, [formData.password, formData.confirmPassword, isRegistering]);
+
+  /** Handle login/register form submission */
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validation for registration mode
+    if (isRegistering &amp;&amp; formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    try {
+      if (isRegistering) {
+        const res = await api.post('users', {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        });
+        alert(`User ${res.username || formData.username} registered successfully!`);
+        setIsRegistering(false);
+        setFormData({ username: '', email: '', password: '', confirmPassword: '' });
+      } else {
+        const res = await api.post('login', {
+          email: formData.email,
+          password: formData.password,
+        });
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          setToken(res.token);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Invalid credentials or server error.');
+    }
+  };
+
+  return (
+    &lt;div className="login-container">
+      &lt;h2>{isRegistering ? 'Register' : 'Login'}&lt;/h2>
+
+      &lt;form onSubmit={handleSubmit} className="login-form">
+        {isRegistering &amp;&amp; (
+          &lt;input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
+        )}
+
+        &lt;input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+
+        &lt;div className="password-wrapper">
+          &lt;input
+            type={showPassword ? 'text' : 'password'}
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+          &lt;button
+            type="button"
+            className="show-password-btn"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? '🙈' : '👁️'}
+          &lt;/button>
+        &lt;/div>
+
+        {isRegistering &amp;&amp; (
+          &lt;>
+            &lt;input
+              type={showPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              placeholder="Confirm Password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+            {passwordMatch !== null &amp;&amp; (
+              &lt;p
+                className={`password-match-text ${
+                  passwordMatch ? 'match' : 'mismatch'
+                }`}
+              >
+                {passwordMatch ? '✅ Passwords match' : '❌ Passwords do not match'}
+              &lt;/p>
+            )}
+          &lt;/>
+        )}
+
+        &lt;button type="submit" className="btn-primary">
+          {isRegistering ? 'Register' : 'Login'}
+        &lt;/button>
+      &lt;/form>
+
+      {error &amp;&amp; &lt;p className="error-text">{error}&lt;/p>}
+
+      &lt;p className="toggle-text">
+        {isRegistering ? 'Already have an account?' : "Don't have an account?"}{' '}
+        &lt;button
+          type="button"
+          className="link-button"
+          onClick={() => {
+            setIsRegistering(!isRegistering);
+            setFormData({ username: '', email: '', password: '', confirmPassword: '' });
+            setPasswordMatch(null);
+            setError('');
+          }}
+        >
+          {isRegistering ? 'Login here' : 'Register here'}
+        &lt;/button>
+      &lt;/p>
+    &lt;/div>
+  );
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:24:27 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

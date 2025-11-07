@@ -29,7 +29,7 @@
 <nav >
     
     
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#API_BASE_URL">API_BASE_URL</a></li><li><a href="global.html#apiClient">apiClient</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~handleSubjectChange">handleSubjectChange</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-ApiRequest.html">ApiRequest</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~requestInterceptor">requestInterceptor</a></li><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~responseInterceptor">responseInterceptor</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-components_LoginForm.html">components/LoginForm</a></li></ul>
     
 </nav>
 
@@ -58,7 +58,7 @@
         <div class="container-overview">
         
             
-                <div class="description usertext">Displays analytical visualizations for different data domains (Customers, Companies, Stocks).Users can select which subject to analyze via a dropdown. Each subject shows corresponding charts.The dashboard fetches aggregated analytics data from backend endpoints using a shared API client.</div>
+                <div class="description usertext">Interactive analytics dashboard displaying visualized metricsfor Customers, Companies, and Stocks. A dropdown lets users choosewhich analytics subject to view. The selection persists across sessionsusing localStorage.</div>
             
 
             
@@ -70,7 +70,7 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Displays analytical visualizations for different data domains (Customers, Companies, Stocks).Users can select which subject to analyze via a dropdown. Each subject shows corresponding charts.The dashboard fetches aggregated analytics data from backend endpoints using a shared API client.</li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li>Interactive analytics dashboard displaying visualized metricsfor Customers, Companies, and Stocks. A dropdown lets users choosewhich analytics subject to view. The selection persists across sessionsusing localStorage.</li></ul></dd>
     
 
     
@@ -183,13 +183,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Chart color palette for categorical visuals.</li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li>Color palette for charts.</li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line48">line 48</a>
+        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line51">line 51</a>
     </li></ul></dd>
     
 
@@ -229,7 +229,7 @@
 
 
 <div class="description usertext">
-    Chart color palette for categorical visuals.
+    Color palette for charts.
 </div>
 
 
@@ -261,163 +261,7 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Average tenure data for customer segments.</li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line36">line 36</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    Average tenure data for customer segments.
-</div>
-
-
-
-    <h5 class="h5-types">Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array.&lt;Object></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="~currencyDist"><span class="type-signature type-signature-inner">(inner) </span>currencyDist<span class="type-signature"> :Array.&lt;Object></span></h4>
-
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Company currency distribution data.</li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line42">line 42</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    Company currency distribution data.
-</div>
-
-
-
-    <h5 class="h5-types">Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Array.&lt;Object></span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="~monthlyJoins"><span class="type-signature type-signature-inner">(inner) </span>monthlyJoins<span class="type-signature"> :Array.&lt;Object></span></h4>
-
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Monthly customer acquisition trend data.</li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li>Average customer tenure per segment.</li></ul></dd>
     
 
     
@@ -463,7 +307,7 @@
 
 
 <div class="description usertext">
-    Monthly customer acquisition trend data.
+    Average customer tenure per segment.
 </div>
 
 
@@ -486,7 +330,7 @@
 
         
             
-<h4 class="name" id="~selectedSubject"><span class="type-signature type-signature-inner">(inner) </span>selectedSubject<span class="type-signature"> :string</span></h4>
+<h4 class="name" id="~currencyDist"><span class="type-signature type-signature-inner">(inner) </span>currencyDist<span class="type-signature"> :Array.&lt;Object></span></h4>
 
 
 
@@ -495,85 +339,7 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Currently selected analytics category.</li></ul></dd>
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line33">line 33</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-<div class="description usertext">
-    Currently selected analytics category.
-</div>
-
-
-
-    <h5 class="h5-types">Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">string</span>
-
-
-
-        </li>
-    </ul>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="~volatility"><span class="type-signature type-signature-inner">(inner) </span>volatility<span class="type-signature"> :Array.&lt;Object></span></h4>
-
-
-
-
-
-<dl class="details">
-    
-    <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Stock price volatility data.</li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li>Company currency distribution.</li></ul></dd>
     
 
     
@@ -619,7 +385,241 @@
 
 
 <div class="description usertext">
-    Stock price volatility data.
+    Company currency distribution.
+</div>
+
+
+
+    <h5 class="h5-types">Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;Object></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="~monthlyJoins"><span class="type-signature type-signature-inner">(inner) </span>monthlyJoins<span class="type-signature"> :Array.&lt;Object></span></h4>
+
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li>Monthly new customer join counts.</li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Monthly new customer join counts.
+</div>
+
+
+
+    <h5 class="h5-types">Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array.&lt;Object></span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="~selectedSubject"><span class="type-signature type-signature-inner">(inner) </span>selectedSubject<span class="type-signature"> :string</span></h4>
+
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li>The analytics subject currently selected by user.</li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    The analytics subject currently selected by user.
+</div>
+
+
+
+    <h5 class="h5-types">Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="~volatility"><span class="type-signature type-signature-inner">(inner) </span>volatility<span class="type-signature"> :Array.&lt;Object></span></h4>
+
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li>Stock price range (volatility) per ticker.</li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line48">line 48</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Stock price range (volatility) per ticker.
 </div>
 
 
@@ -661,13 +661,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>React component displaying analytics for Customers, Companies, and Stocks.A dropdown lets users toggle which subject’s charts are visible.Data is fetched once and stored in state to avoid redundant requests.</li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li>Renders analytics charts for Customers, Companies, and Stocks.Fetches data from backend API once on mount and displays the chosendataset based on user selection. Remembers last selected subject in localStorage.</li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line23">line 23</a>
+        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line24">line 24</a>
     </li></ul></dd>
     
 
@@ -759,6 +759,141 @@
 
     
 
+    <h4 class="name" id="~handleSubjectChange"><span class="type-signature type-signature-inner">(inner) </span>handleSubjectChange<span class="signature">(e)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li>Handles user selection from the dropdown and stores the selection in localStorage.</li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line99">line 99</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="h5-parameters">Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>e</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">React.ChangeEvent.&lt;HTMLSelectElement></span>
+
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The dropdown change event.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
     <h4 class="name" id="~useEffect"><span class="type-signature type-signature-inner">(inner) </span>useEffect<span class="signature">()</span><span class="type-signature"></span></h4>
 
     
@@ -769,13 +904,13 @@
 <dl class="details">
     
     <dt class="tag-description">Description:</dt>
-    <dd class="tag-description"><ul class="dummy"><li>Fetches analytics data from backend endpoints for all subjects (customers, companies, stocks).Each dataset is normalized and coerced to numeric form for Recharts compatibility.Executed once when the component mounts.</li></ul></dd>
+    <dd class="tag-description"><ul class="dummy"><li>Fetch analytics data for all domains once when component mounts.Normalizes and coerces numeric fields for Recharts.</li></ul></dd>
     
 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line51">line 51</a>
+        <a href="pages_AnalyticsDashboard.js.html">pages/AnalyticsDashboard.js</a>, <a href="pages_AnalyticsDashboard.js.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -859,7 +994,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 16:40:20 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:24:27 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

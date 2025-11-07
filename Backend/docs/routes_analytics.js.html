@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>routes/analytics.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routes_analytics.html">routes/analytics</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/by-sector-country">GET /api/analytics/companies/by-sector-country</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/currency-distribution">GET /api/analytics/companies/currency-distribution</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/avg-tenure">GET /api/analytics/customers/avg-tenure</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/monthly-joins">GET /api/analytics/customers/monthly-joins</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/price-trend">GET /api/analytics/stocks/price-trend</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/volatility">GET /api/analytics/stocks/volatility</a></li></ul></li><li><a href="module-routes_rawData.html">routes/rawData</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_rawData.html#~GET/api/fetch_table">GET /api/fetch_table</a></li></ul></li><li><a href="module-routes_users.html">routes/users</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_users.html#~DELETE/api/users/:id">DELETE /api/users/:id</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~GET/api/users">GET /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/login">POST /api/login</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/users">POST /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~PUT/api/users/:id">PUT /api/users/:id</a></li></ul></li><li><a href="module-server_index.html">server/index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-server_index.html#~loadEnvironment">loadEnvironment</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~registerRoutes">registerRoutes</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~startServer">startServer</a></li></ul></li><li><a href="module-services.html">services</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-services.html#~authenticateToken">authenticateToken</a></li></ul></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">routes/analytics.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file analytics.js
+ * @module routes/analytics
+ * @description
+ * Provides analytical endpoints for customers, companies, and stock price data.
+ * Each endpoint performs SQL aggregations and returns preprocessed data for dashboard visualization.
+ */
+
+/**
+ * @requires ../services - Shared backend services including JWT authentication middleware.
+ */
+const { authenticateToken } = require('../services');
+
+/**
+ * @function module.exports
+ * @description
+ * Registers analytics route handlers to the given Express app.
+ *
+ * @param {Object} app - Express application instance.
+ * @param {Object} conn - PostgreSQL database connection object.
+ */
+module.exports = (app, conn) => {
+
+  // ---------------------------------------------------------------------------
+  // CUSTOMER ANALYTICS
+  // ---------------------------------------------------------------------------
+
+  /**
+   * @function GET /api/analytics/customers/avg-tenure
+   * @description
+   * Retrieves the average customer tenure (in years) grouped by customer segment.
+   * Used for analyzing retention and loyalty across different customer segments.
+   * @returns {Array&lt;{segment: string, avg_tenure: number}>}
+   */
+  app.get('/api/customers/avg-tenure', authenticateToken, (req, res, next) => {
+    const sql = `
+      SELECT segment, ROUND(AVG(tenureyears)::numeric, 2) AS avg_tenure
+      FROM customers
+      GROUP BY segment
+      ORDER BY avg_tenure DESC;
+    `;
+
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error fetching customer tenure analytics:', err);
+        next(err);
+        return;
+      }
+      res.send(results.rows || results);
+    });
+  });
+
+  /**
+   * @function GET /api/analytics/customers/monthly-joins
+   * @description
+   * Returns the number of customers who joined per month,
+   * providing a trend of customer acquisition over time.
+   * @returns {Array&lt;{month: string, new_customers: number}>}
+   */
+  app.get('/api/customers/monthly-joins', authenticateToken, (req, res, next) => {
+    const sql = `
+      SELECT TO_CHAR(joindate, 'YYYY-MM') AS month, COUNT(*) AS new_customers
+      FROM customers
+      GROUP BY 1
+      ORDER BY 1;
+    `;
+
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error fetching monthly join data:', err);
+        next(err);
+        return;
+      }
+      res.send(results.rows || results);
+    });
+  });
+
+
+  // ---------------------------------------------------------------------------
+  // COMPANY ANALYTICS
+  // ---------------------------------------------------------------------------
+
+  /**
+   * @function GET /api/analytics/companies/by-sector-country
+   * @description
+   * Returns the count of companies grouped by sector and country.
+   * Useful for understanding geographic and industry distribution.
+   * @returns {Array&lt;{country: string, sector: string, company_count: number}>}
+   */
+  app.get('/api/companies/by-sector-country', authenticateToken, (req, res, next) => {
+    const sql = `
+      SELECT country, sector, COUNT(*) AS company_count
+      FROM companies
+      GROUP BY country, sector
+      ORDER BY country, sector;
+    `;
+
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error fetching company sector-country distribution:', err);
+        next(err);
+        return;
+      }
+      res.send(results.rows || results);
+    });
+  });
+
+  /**
+   * @function GET /api/analytics/companies/currency-distribution
+   * @description
+   * Returns the number of companies operating under each trading currency.
+   * Used to evaluate exposure to various currencies.
+   * @returns {Array&lt;{currency: string, company_count: number}>}
+   */
+  app.get('/api/companies/currency-distribution', authenticateToken, (req, res, next) => {
+    const sql = `
+      SELECT currency, COUNT(*) AS company_count
+      FROM companies
+      GROUP BY currency
+      ORDER BY company_count DESC;
+    `;
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error fetching company currency distribution:', err);
+        next(err);
+        return;
+      }
+      res.send(results.rows || results);
+    });
+  });
+
+
+  // ---------------------------------------------------------------------------
+  // STOCK PRICE ANALYTICS
+  // ---------------------------------------------------------------------------
+
+  /**
+   * @function GET /api/analytics/stocks/price-trend
+   * @description
+   * Returns average daily closing prices for each stock ticker (or a specific ticker if provided).
+   * Useful for visualizing price trends over time.
+   * @query {string} [ticker] - Optional ticker filter for a single stock.
+   * @returns {Array&lt;{ticker: string, trade_date: string, avg_close: number}>}
+   */
+  app.get('/api/stocks/price-trend', authenticateToken, (req, res, next) => {
+    const ticker = req.query.ticker;
+    const sql = `
+      SELECT ticker,
+             TO_DATE(date, 'DD/MM/YYYY') AS trade_date,
+             ROUND(AVG(close)::numeric, 2) AS avg_close
+      FROM stock_prices
+      ${ticker ? `WHERE ticker = '${ticker}'` : ''}
+      GROUP BY ticker, trade_date
+      ORDER BY trade_date;
+    `;
+
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error fetching stock price trend:', err);
+        next(err);
+        return;
+      }
+      res.send(results.rows || results);
+    });
+  });
+
+  /**
+   * @function GET /api/analytics/stocks/volatility
+   * @description
+   * Returns the price range (volatility) for each stock ticker.
+   * Volatility = MAX(close) - MIN(close)
+   * @returns {Array&lt;{ticker: string, price_range: number}>}
+   */
+  app.get('/api/stocks/volatility', authenticateToken, (req, res, next) => {
+    const sql = `
+      SELECT ticker, ROUND(MAX(close) - MIN(close), 2) AS price_range
+      FROM stock_prices
+      GROUP BY ticker
+      ORDER BY price_range DESC;
+    `;
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Error fetching stock volatility:', err);
+        next(err);
+        return;
+      }
+      res.send(results.rows || results);
+    });
+  });
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:32:08 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

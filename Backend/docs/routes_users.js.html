@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>routes/users.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routes_analytics.html">routes/analytics</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/by-sector-country">GET /api/analytics/companies/by-sector-country</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/currency-distribution">GET /api/analytics/companies/currency-distribution</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/avg-tenure">GET /api/analytics/customers/avg-tenure</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/monthly-joins">GET /api/analytics/customers/monthly-joins</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/price-trend">GET /api/analytics/stocks/price-trend</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/volatility">GET /api/analytics/stocks/volatility</a></li></ul></li><li><a href="module-routes_rawData.html">routes/rawData</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_rawData.html#~GET/api/fetch_table">GET /api/fetch_table</a></li></ul></li><li><a href="module-routes_users.html">routes/users</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_users.html#~DELETE/api/users/:id">DELETE /api/users/:id</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~GET/api/users">GET /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/login">POST /api/login</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/users">POST /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~PUT/api/users/:id">PUT /api/users/:id</a></li></ul></li><li><a href="module-server_index.html">server/index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-server_index.html#~loadEnvironment">loadEnvironment</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~registerRoutes">registerRoutes</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~startServer">startServer</a></li></ul></li><li><a href="module-services.html">services</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-services.html#~authenticateToken">authenticateToken</a></li></ul></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">routes/users.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file users.js
+ * @module routes/users
+ * @description
+ * CRUD + authentication routes for the `users` table.
+ * Includes password hashing (bcrypt), JWT-based login, and token verification.
+ */
+
+/**
+ * @requires ../services - Shared backend services including JWT authentication middleware.
+ */
+const { authenticateToken } = require('../services');
+
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+module.exports = (app, conn) => {
+  /**
+   * @function POST /api/users
+   * @description Inserts a new user record with a hashed password.
+   */
+  app.post('/api/users', async (req, res, next) => {
+    const { username, email, password, role = 'user' } = req.body;
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const sql = `
+        INSERT INTO users (username, email, password, role)
+        VALUES ('${username}', '${email}', '${hashedPassword}', '${role}')
+        RETURNING userid, username, email, role, created_at;
+      `;
+
+      console.log(sql);
+      conn.query(sql, (err, results) => {
+        if (err) {
+          console.error('Database insert error:', err.message);
+          next(err);
+          return;
+        }
+        res.status(201).send(results.rows[0]);
+      });
+    } catch (error) {
+      console.error('Password hashing error:', error.message);
+      next(error);
+    }
+  });
+
+  /**
+   * @function POST /api/login
+   * @description Authenticates a user and returns a JWT token.
+   */
+  app.post('/api/login', (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
+
+    const sql = `SELECT * FROM users WHERE email = '${email}';`;
+    console.log(sql);
+    conn.query(sql, async (err, results) => {
+      if (err) {
+        console.error('Database query error:', err.message);
+        next(err);
+        return;
+      }
+
+      if (!results.rows || results.rows.length === 0) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const user = results.rows[0];
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const token = jwt.sign(
+        { userid: user.userid, username: user.username, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '2h' }
+      );
+
+      res.send({ token });
+    });
+  });
+
+  /**
+   * @function GET /api/users
+   * @description Retrieves all users (admin only, protected).
+   */
+  app.get('/api/users', authenticateToken, (req, res, next) => {
+
+    const sql = `SELECT userid, username, email, role, created_at FROM users ORDER BY userid ASC;`;
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Database query error:', err.message);
+        next(err);
+        return;
+      }
+      res.send(results.rows);
+    });
+  });
+
+  /**
+   * @function PUT /api/users/:id
+   * @description Updates user details (protected route, admin or self).
+   */
+  app.put('/api/users/:id', authenticateToken, (req, res, next) => {
+    const { id } = req.params;
+    const { username, email, role } = req.body;
+
+    if (req.user.userid != id) {
+      return res.status(403).json({ error: 'Permission denied' });
+    }
+
+    const sql = `
+      UPDATE users
+      SET username = COALESCE('${username}', username),
+          email = COALESCE('${email}', email),
+          role = COALESCE('${role}', role)
+      WHERE userid = ${id}
+      RETURNING userid, username, email, role, created_at;
+    `;
+
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Database update error:', err.message);
+        next(err);
+        return;
+      }
+      if (results.rowCount === 0) {
+        res.status(404).json({ error: 'User not found' });
+      } else {
+        res.send(results.rows[0]);
+      }
+    });
+  });
+
+  /**
+   * @function DELETE /api/users/:id
+   * @description Deletes a user record by ID (admin only).
+   */
+  app.delete('/api/users/:id', authenticateToken, (req, res, next) => {
+    const { id } = req.params;
+
+    const sql = `DELETE FROM users WHERE userid = ${id} RETURNING userid;`;
+    console.log(sql);
+    conn.query(sql, (err, results) => {
+      if (err) {
+        console.error('Database delete error:', err.message);
+        next(err);
+        return;
+      }
+      if (results.rowCount === 0) {
+        res.status(404).json({ error: 'User not found' });
+      } else {
+        res.send({ message: 'User deleted successfully', deleted_user_id: id });
+      }
+    });
+  });
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:32:08 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

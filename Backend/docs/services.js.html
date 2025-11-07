@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>services.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-routes_analytics.html">routes/analytics</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/by-sector-country">GET /api/analytics/companies/by-sector-country</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/companies/currency-distribution">GET /api/analytics/companies/currency-distribution</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/avg-tenure">GET /api/analytics/customers/avg-tenure</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/customers/monthly-joins">GET /api/analytics/customers/monthly-joins</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/price-trend">GET /api/analytics/stocks/price-trend</a></li><li data-type='method' style='display: none;'><a href="module-routes_analytics.html#~GET/api/analytics/stocks/volatility">GET /api/analytics/stocks/volatility</a></li></ul></li><li><a href="module-routes_rawData.html">routes/rawData</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_rawData.html#~GET/api/fetch_table">GET /api/fetch_table</a></li></ul></li><li><a href="module-routes_users.html">routes/users</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-routes_users.html#~DELETE/api/users/:id">DELETE /api/users/:id</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~GET/api/users">GET /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/login">POST /api/login</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~POST/api/users">POST /api/users</a></li><li data-type='method' style='display: none;'><a href="module-routes_users.html#~PUT/api/users/:id">PUT /api/users/:id</a></li></ul></li><li><a href="module-server_index.html">server/index</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-server_index.html#~loadEnvironment">loadEnvironment</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~registerRoutes">registerRoutes</a></li><li data-type='method' style='display: none;'><a href="module-server_index.html#~startServer">startServer</a></li></ul></li><li><a href="module-services.html">services</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-services.html#~authenticateToken">authenticateToken</a></li></ul></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">services.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file services.js
+ * @module services
+ * @description
+ * Provides shared backend services such as JWT authentication middleware.
+ */
+
+const jwt = require('jsonwebtoken');
+const JWT_SECRET = process.env.JWT_SECRET;
+
+/**
+ * @function authenticateToken
+ * @description
+ * Express middleware that verifies JWT tokens from the Authorization header.
+ * - Extracts the token from the "Authorization: Bearer &lt;token>" header.
+ * - Verifies it against the server's secret key.
+ * - Attaches decoded user info (e.g., userid, username, role) to req.user.
+ * 
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {object} next - Express next function.
+ * @returns {void} Calls `next()` if valid, otherwise sends a 401 or 403 error response.
+ */
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader &amp;&amp; authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Missing token' });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      console.error('Invalid token:', err.message);
+      return res.status(403).json({ error: 'Invalid token' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+module.exports = { authenticateToken };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:32:08 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+<script src="scripts/collapse.js" defer></script>
+
+
+</body>
+</html>

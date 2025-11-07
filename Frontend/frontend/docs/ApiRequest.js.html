@@ -29,7 +29,7 @@
 <nav >
     
     
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#API_BASE_URL">API_BASE_URL</a></li><li><a href="global.html#apiClient">apiClient</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~handleSubjectChange">handleSubjectChange</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-ApiRequest.html">ApiRequest</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~requestInterceptor">requestInterceptor</a></li><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~responseInterceptor">responseInterceptor</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-components_LoginForm.html">components/LoginForm</a></li></ul>
     
 </nav>
 
@@ -48,6 +48,15 @@
             <pre class="prettyprint source linenums"><code>import axios from "axios";
 
 /**
+ * @file ApiRequest.js
+ * @module ApiRequest
+ * @description
+ * Centralized API handler for all HTTP requests.
+ * Automatically includes JWT token (if available in localStorage)
+ * in the Authorization header for secure endpoints.
+ */
+
+/**
  * Base URL for the API requests
  */
 const API_BASE_URL = "http://localhost:4000/api";
@@ -61,34 +70,89 @@ const apiClient = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
+/**
+ * @function requestInterceptor
+ * @description
+ * Attaches JWT token to the Authorization header for every outgoing request.
+ */
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+/**
+ * @function responseInterceptor
+ * @description
+ * Handles unauthorized (401) responses globally and logs out user if needed.
+ */
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn("Unauthorized — token may be missing or expired.");
+      // Optionally, clear storage and redirect:
+      // localStorage.removeItem("token");
+      // window.location.href = "/";
+    }
+    return Promise.reject(error);
+  }
+);
+
 // --- Reusable typed requests ---
 export const api = {
-  // GET request
+  /**
+   * GET request
+   * @param {string} endpoint - API endpoint (relative path)
+   * @param {Object} [params] - Query parameters
+   * @returns {Promise&lt;any>} Response data
+   */
   get: async (endpoint, params = {}) => {
     const response = await apiClient.get(endpoint, { params });
     return response.data;
   },
 
-  // POST request
+  /**
+   * POST request
+   * @param {string} endpoint - API endpoint
+   * @param {Object} [body] - Request body
+   * @returns {Promise&lt;any>} Response data
+   */
   post: async (endpoint, body = {}) => {
     const response = await apiClient.post(endpoint, body);
     return response.data;
   },
 
-  // PUT request
+  /**
+   * PUT request
+   * @param {string} endpoint - API endpoint
+   * @param {Object} [body] - Request body
+   * @returns {Promise&lt;any>} Response data
+   */
   put: async (endpoint, body = {}) => {
     const response = await apiClient.put(endpoint, body);
     return response.data;
   },
 
-  // DELETE request
+  /**
+   * DELETE request
+   * @param {string} endpoint - API endpoint
+   * @param {Object} [params] - Query parameters
+   * @returns {Promise&lt;any>} Response data
+   */
   delete: async (endpoint, params = {}) => {
     const response = await apiClient.delete(endpoint, { params });
     return response.data;
   },
 };
 
-export default api;</code></pre>
+export default api;
+</code></pre>
         </article>
     </section>
 
@@ -102,7 +166,7 @@ export default api;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 16:40:20 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:24:27 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>

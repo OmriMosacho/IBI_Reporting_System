@@ -16,7 +16,7 @@ const { authenticateToken } = require('../services');
  * @description
  * Registers analytics route handlers to the given Express app.
  *
- * @param {import('express').Application} app - Express application instance.
+ * @param {Object} app - Express application instance.
  * @param {Object} conn - PostgreSQL database connection object.
  */
 module.exports = (app, conn) => {

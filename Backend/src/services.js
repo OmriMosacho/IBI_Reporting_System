@@ -16,9 +16,9 @@ const JWT_SECRET = process.env.JWT_SECRET;
  * - Verifies it against the server's secret key.
  * - Attaches decoded user info (e.g., userid, username, role) to req.user.
  * 
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @param {import('express').NextFunction} next - Express next function.
+ * @param {object} req - Express request object.
+ * @param {object} res - Express response object.
+ * @param {object} next - Express next function.
  * @returns {void} Calls `next()` if valid, otherwise sends a 401 or 403 error response.
  */
 function authenticateToken(req, res, next) {

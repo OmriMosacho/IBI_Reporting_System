@@ -29,7 +29,7 @@
 <nav >
     
     
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html#API_BASE_URL">API_BASE_URL</a></li><li><a href="global.html#apiClient">apiClient</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-AnalyticsDashboard.html">AnalyticsDashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~AnalyticsDashboard">AnalyticsDashboard</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~handleSubjectChange">handleSubjectChange</a></li><li data-type='method' style='display: none;'><a href="module-AnalyticsDashboard.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-ApiRequest.html">ApiRequest</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~requestInterceptor">requestInterceptor</a></li><li data-type='method' style='display: none;'><a href="module-ApiRequest.html#~responseInterceptor">responseInterceptor</a></li></ul></li><li><a href="module-Dashboard.html">Dashboard</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-Dashboard.html#~handleLogout">handleLogout</a></li></ul></li><li><a href="module-DataTable.html">DataTable</a><ul class='methods'><li data-type='method' style='display: none;'><a href="module-DataTable.html#~DataTable">DataTable</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~formatCellValue">formatCellValue</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~handleLoadMore">handleLoadMore</a></li><li data-type='method' style='display: none;'><a href="module-DataTable.html#~useEffect">useEffect</a></li></ul></li><li><a href="module-components_LoginForm.html">components/LoginForm</a></li></ul>
     
 </nav>
 
@@ -49,9 +49,10 @@
  * @file AnalyticsDashboard.js
  * @module AnalyticsDashboard
  * @description
- * Displays analytical visualizations for different data domains (Customers, Companies, Stocks).
- * Users can select which subject to analyze via a dropdown. Each subject shows corresponding charts.
- * The dashboard fetches aggregated analytics data from backend endpoints using a shared API client.
+ * Interactive analytics dashboard displaying visualized metrics
+ * for Customers, Companies, and Stocks. A dropdown lets users choose
+ * which analytics subject to view. The selection persists across sessions
+ * using localStorage.
  *
  * @requires react
  * @requires recharts
@@ -70,37 +71,38 @@ import './AnalyticsDashboard.css';
 /**
  * @function AnalyticsDashboard
  * @description
- * React component displaying analytics for Customers, Companies, and Stocks.
- * A dropdown lets users toggle which subject’s charts are visible.
- * Data is fetched once and stored in state to avoid redundant requests.
+ * Renders analytics charts for Customers, Companies, and Stocks.
+ * Fetches data from backend API once on mount and displays the chosen
+ * dataset based on user selection. Remembers last selected subject in localStorage.
  *
  * @returns {JSX.Element} The rendered analytics dashboard component.
  */
 export default function AnalyticsDashboard() {
-  /** @member {string} selectedSubject - Currently selected analytics category. */
-  const [selectedSubject, setSelectedSubject] = useState('customers');
+  /** @member {string} selectedSubject - The analytics subject currently selected by user. */
+  const [selectedSubject, setSelectedSubject] = useState(
+    localStorage.getItem('selectedSubject') || 'customers'
+  );
 
-  /** @member {Array&lt;Object>} avgTenure - Average tenure data for customer segments. */
+  /** @member {Array&lt;Object>} avgTenure - Average customer tenure per segment. */
   const [avgTenure, setAvgTenure] = useState([]);
 
-  /** @member {Array&lt;Object>} monthlyJoins - Monthly customer acquisition trend data. */
+  /** @member {Array&lt;Object>} monthlyJoins - Monthly new customer join counts. */
   const [monthlyJoins, setMonthlyJoins] = useState([]);
 
-  /** @member {Array&lt;Object>} currencyDist - Company currency distribution data. */
+  /** @member {Array&lt;Object>} currencyDist - Company currency distribution. */
   const [currencyDist, setCurrencyDist] = useState([]);
 
-  /** @member {Array&lt;Object>} volatility - Stock price volatility data. */
+  /** @member {Array&lt;Object>} volatility - Stock price range (volatility) per ticker. */
   const [volatility, setVolatility] = useState([]);
 
-  /** @member {Array&lt;string>} COLORS - Chart color palette for categorical visuals. */
+  /** @member {Array&lt;string>} COLORS - Color palette for charts. */
   const COLORS = ['#4A6EF5', '#F57C00', '#00BFA5', '#BA68C8', '#43A047'];
 
   /**
    * @function useEffect
    * @description
-   * Fetches analytics data from backend endpoints for all subjects (customers, companies, stocks).
-   * Each dataset is normalized and coerced to numeric form for Recharts compatibility.
-   * Executed once when the component mounts.
+   * Fetch analytics data for all domains once when component mounts.
+   * Normalizes and coerces numeric fields for Recharts.
    */
   useEffect(() => {
     Promise.all([
@@ -141,17 +143,28 @@ export default function AnalyticsDashboard() {
       .catch((err) => console.error('Error fetching analytics:', err));
   }, []);
 
+  /**
+   * @function handleSubjectChange
+   * @description Handles user selection from the dropdown and stores the selection in localStorage.
+   * @param {React.ChangeEvent&lt;HTMLSelectElement>} e - The dropdown change event.
+   */
+  const handleSubjectChange = (e) => {
+    const value = e.target.value;
+    setSelectedSubject(value);
+    localStorage.setItem('selectedSubject', value);
+  };
+
   return (
     &lt;div className="analytics-container">
       &lt;h1>Analytics Dashboard&lt;/h1>
 
-      {/* ========== DROPDOWN SELECTOR ========== */}
+      {/* ===== Dropdown Filter ===== */}
       &lt;div className="dropdown-container">
         &lt;label htmlFor="subject-select">Select Subject:&lt;/label>
         &lt;select
           id="subject-select"
           value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
+          onChange={handleSubjectChange}
         >
           &lt;option value="customers">Customers&lt;/option>
           &lt;option value="companies">Companies&lt;/option>
@@ -159,7 +172,7 @@ export default function AnalyticsDashboard() {
         &lt;/select>
       &lt;/div>
 
-      {/* ========== CUSTOMERS SECTION ========== */}
+      {/* ===== CUSTOMERS ===== */}
       {selectedSubject === 'customers' &amp;&amp; (
         &lt;section>
           &lt;h2>Customers&lt;/h2>
@@ -184,17 +197,20 @@ export default function AnalyticsDashboard() {
               &lt;YAxis />
               &lt;Tooltip />
               &lt;Legend />
-              &lt;Line type="monotone" dataKey="new_customers" stroke="#F57C00" />
+              &lt;Line
+                type="monotone"
+                dataKey="new_customers"
+                stroke="#F57C00"
+              />
             &lt;/LineChart>
           &lt;/ResponsiveContainer>
         &lt;/section>
       )}
 
-      {/* ========== COMPANIES SECTION ========== */}
+      {/* ===== COMPANIES ===== */}
       {selectedSubject === 'companies' &amp;&amp; (
         &lt;section>
           &lt;h2>Companies&lt;/h2>
-
           {currencyDist.length === 0 ? (
             &lt;p>Loading currency distribution...&lt;/p>
           ) : (
@@ -228,7 +244,7 @@ export default function AnalyticsDashboard() {
         &lt;/section>
       )}
 
-      {/* ========== STOCKS SECTION ========== */}
+      {/* ===== STOCKS ===== */}
       {selectedSubject === 'stocks' &amp;&amp; (
         &lt;section>
           &lt;h2>Stock Volatility&lt;/h2>
@@ -261,7 +277,7 @@ export default function AnalyticsDashboard() {
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 16:40:20 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> on Fri Nov 07 2025 19:24:27 GMT+0200 (Israel Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
 <script>prettyPrint();</script>
