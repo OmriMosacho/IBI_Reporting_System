@@ -44,6 +44,7 @@ export default function DataTable({ tableName, title, columns, token }) {
       .then((res) => setData(res.rows || []))
       .catch((err) => {
         console.error(err);
+        alert(`Failed to load ${title.toLowerCase()}. Please try again later.`);
         setError(`Failed to load ${title.toLowerCase()}`);
       })
       .finally(() => setLoading(false));

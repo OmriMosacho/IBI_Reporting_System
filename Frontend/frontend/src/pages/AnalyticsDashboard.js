@@ -93,7 +93,10 @@ export default function AnalyticsDashboard() {
         }));
         setVolatility(fixedVol);
       })
-      .catch((err) => console.error('Error fetching analytics:', err));
+      .catch((err) => {
+        console.error('Error fetching analytics:', err);
+        alert('Failed to load analytics data. Please try again later.');
+      });
   }, []);
 
   /**
